@@ -1,4 +1,6 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
+import { WalletLinkConnector } from "@web3-react/walletlink-connector";
+import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 
@@ -11,29 +13,19 @@ import { Web3Provider } from "@ethersproject/providers";
 
 /**
  * [ walletconnect 지갑으로 연결하기 ]
+ * 1. WalletLinkConnector 연동 완료
  */
 
 type Account = string | null | undefined;
 type Library = Web3Provider | undefined;
 type ChainId = number | undefined;
 
-interface Ethereum extends Window {
-  ethereum: {
-    request(args: RequestArguments): Promise<unknown>;
-  };
-}
-
-interface RequestArguments {
-  method: string;
-  params?: unknown[] | object;
-}
-
 function App() {
-  const ethereum = (window as unknown as Ethereum).ethereum;
+  const ethereum = (window as any).ethereum;
   const { chainId, account, active, activate, deactivate, library, setError } =
     useWeb3React<Web3Provider>();
 
-  const connectWallet = async () => {
+  const connectMetaMask = async () => {
     const initInjected = new InjectedConnector({});
     await activate(initInjected);
 
@@ -42,6 +34,19 @@ function App() {
     } else {
       changeChainId(97);
     }
+  };
+
+  const connectWalletLink = async () => {
+    const walletLink = new WalletLinkConnector({
+      url: "https://rinkeby.infura.io/v3/<my-api-key>",
+      appName: "hash_like",
+    });
+    await activate(walletLink);
+  };
+
+  const connectWalletConnect = async () => {
+    const walletConnect = new WalletConnectConnector({});
+    await activate(walletConnect);
   };
 
   const disConnectWallet = () => {
@@ -72,8 +77,6 @@ function App() {
     }
   };
 
-  const initWalletConnect = () => {};
-
   const handleOnClick = (callback: (...args: any) => any) => () => callback();
 
   const getData = async (account: Account, library: Library) => {
@@ -94,14 +97,17 @@ function App() {
         <p>네트워크 아이디 {chainId}</p>
         <p>지갑 주소 {account}</p>
       </div>
-      <button type="button" onClick={handleOnClick(connectWallet)}>
+      <button type="button" onClick={handleOnClick(connectMetaMask)}>
         메타 마스크 연결
       </button>
-      <button type="button" onClick={handleOnClick(disConnectWallet)}>
-        메타 마스크 연결해제
+      <button type="button" onClick={handleOnClick(connectWalletConnect)}>
+        Wallet Connect 연결
       </button>
-      <button type="button" onClick={handleOnClick(initWalletConnect)}>
-        Wallet Connect
+      <button type="button" onClick={handleOnClick(connectWalletLink)}>
+        Wallet Link 연결
+      </button>
+      <button type="button" onClick={handleOnClick(disConnectWallet)}>
+        지갑 연결 해제
       </button>
     </div>
   );
