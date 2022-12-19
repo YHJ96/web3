@@ -55,17 +55,27 @@ function App() {
 
   const changeChainId = (chainId: number) => {
     const toHexChainId = `0x${chainId.toString(16)}`;
-    ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: toHexChainId }],
-    });
+    try {
+      ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: { chainId: toHexChainId },
+      });
+    } catch (err) {
+      const error = err as Error;
+      throw error.message;
+    }
   };
 
   const handleOnClick = (callback: (...args: any) => any) => () => callback();
 
   const getData = async (account: Account, library: Library) => {
     if (account) {
-      await library?.getBalance(account);
+      try {
+        await library?.getBalance(account);
+      } catch (err) {
+        const error = err as Error;
+        throw error.message;
+      }
     }
   };
 
