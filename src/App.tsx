@@ -25,8 +25,16 @@ interface RequestArguments {
 
 function App() {
   const ethereum = (window as unknown as Ethereum).ethereum;
-  const { chainId, account, active, activate, deactivate, library } =
-    useWeb3React<Web3Provider>();
+  const {
+    chainId,
+    account,
+    active,
+    activate,
+    deactivate,
+    library,
+    error,
+    setError,
+  } = useWeb3React<Web3Provider>();
 
   const connectWallet = async () => {
     const initInjected = new InjectedConnector({});
@@ -53,16 +61,17 @@ function App() {
     }
   };
 
-  const changeChainId = (chainId: number) => {
+  const changeChainId = async (chainId: number) => {
     const toHexChainId = `0x${chainId.toString(16)}`;
     try {
-      ethereum.request({
+      await ethereum.request({
         method: "wallet_switchEthereumChain",
         params: { chainId: toHexChainId },
       });
     } catch (err) {
       const error = err as Error;
-      throw error.message;
+      setError(error);
+      alert(error.message);
     }
   };
 
