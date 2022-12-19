@@ -3,9 +3,14 @@ import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 
 /**
+ * [ 바이낸스 네트워크로 연결하기 ]
  * 1. 최초의 지갑을 연결하여 chainId를 확인한다.
  * 2. 97번 바이낸스 메인넷인지 확인한다.
  * 3. 바이낸스 메인넷이 아니라면 네트워크를 바꾸는 창을 출력한다.
+ */
+
+/**
+ * [ walletconnect 지갑으로 연결하기 ]
  */
 
 type Account = string | null | undefined;
@@ -25,16 +30,8 @@ interface RequestArguments {
 
 function App() {
   const ethereum = (window as unknown as Ethereum).ethereum;
-  const {
-    chainId,
-    account,
-    active,
-    activate,
-    deactivate,
-    library,
-    error,
-    setError,
-  } = useWeb3React<Web3Provider>();
+  const { chainId, account, active, activate, deactivate, library, setError } =
+    useWeb3React<Web3Provider>();
 
   const connectWallet = async () => {
     const initInjected = new InjectedConnector({});
@@ -66,7 +63,7 @@ function App() {
     try {
       await ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: { chainId: toHexChainId },
+        params: [{ chainId: toHexChainId }],
       });
     } catch (err) {
       const error = err as Error;
@@ -74,6 +71,8 @@ function App() {
       alert(error.message);
     }
   };
+
+  const initWalletConnect = () => {};
 
   const handleOnClick = (callback: (...args: any) => any) => () => callback();
 
@@ -100,6 +99,9 @@ function App() {
       </button>
       <button type="button" onClick={handleOnClick(disConnectWallet)}>
         메타 마스크 연결해제
+      </button>
+      <button type="button" onClick={handleOnClick(initWalletConnect)}>
+        Wallet Connect
       </button>
     </div>
   );
