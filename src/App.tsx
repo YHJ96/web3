@@ -35,7 +35,7 @@ function App() {
     if (isCheckedChainId(chainId)) {
       await getData(account, library);
     } else {
-      changeChainId();
+      changeChainId(97);
     }
   };
 
@@ -53,10 +53,11 @@ function App() {
     }
   };
 
-  const changeChainId = () => {
+  const changeChainId = (chainId: number) => {
+    const toHexChainId = `0x${chainId.toString(16)}`;
     ethereum.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x61" }],
+      params: [{ chainId: toHexChainId }],
     });
   };
 
